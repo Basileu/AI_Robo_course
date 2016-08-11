@@ -93,6 +93,18 @@ def sense(p, colors, measurement, sensor_right):
     return q
 
 # def move(p, U):
+def transpose(lst):
+    newlist = []
+    i = 0
+    while i < len(lst):
+        j = 0
+        colvec = []
+        while j < len(lst):
+            colvec.append(lst[j][i])
+            j = j + 1
+        newlist.append(colvec)
+        i = i + 1
+    return newlist
 def move(p, motion, p_move):
     print 'function MOVE called'
     q = []
@@ -173,12 +185,14 @@ def move(p, motion, p_move):
                 w = w + p_move * row[(j-1)%len(row)]
                 #print 'w final = ', w
                 temp.append(w)
-                q.append(temp)
+            q.append(temp)
         print 'q final = ', q
         # q = zip(*q) 
+        # ddd  = map(list, izip_longest(*q))
+        # ddd = [[row[i] for row in q] for i in range(len(q[1]))]
         ddd  = map(list, zip(*q))
         # print 'q final = ', q
-        # print 'ddd = ', ddd
+        print 'ddd = ', ddd
         q = ddd
     elif (motion == [-1,0]):
         print 'UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUuuuu'
@@ -202,8 +216,9 @@ def move(p, motion, p_move):
                 w = w + p_move * row[(j+1)%len(row)]
                 #print 'w final = ', w
                 temp.append(w)
-        q.append(temp)
+            q.append(temp)
         ddd  = map(list, zip(*q))
+        # ddd = [[row[i] for row in q] for i in range(len(q[1]))]
         # print 'q final = ', q
         # print 'ddd = ', ddd
         q = ddd        
@@ -262,14 +277,13 @@ def show(p):
 # measurements = ['G','G','G','G','G']
 # motions = [[0,0],[0,1],[1,0],[1,0],[0,1]]
 # p = localize(colors,measurements,motions,sensor_right = 0.7, p_move = 0.8)
-colors = [['G', 'G', 'G'],
-          ['G', 'R', 'R'],
-          ['G', 'G', 'G']]
-measurements = ['R', 'R']
-motions = [[0,0], [0,1]]
-sensor_right = 1.0
-p_move = 0.5
-p = localize(colors,measurements,motions,sensor_right,p_move)
+colors = [['R','G','G','R','R'],
+          ['R','R','G','R','R'],
+          ['R','R','G','G','R'],
+          ['R','R','R','R','R']]
+measurements = ['G','G','G','G','G']
+motions = [[0,0],[0,1],[1,0],[1,0],[0,1]]
+p = localize(colors,measurements,motions,sensor_right = 0.7, p_move = 0.8)
 show(p) # displays your answer
 # sense(p)
 # sense(p,  colors, 'R', sensor_right = 0.7)
