@@ -72,6 +72,7 @@ def sense(p, colors, measurement, sensor_right):
             hit = (measurement == world[j]) 
             # print hit, world[j]
             temp.append(p[i][j] * (hit * pHit + (1-hit) * pMiss))
+            # temp.append(1)
             # q.append(p[i])
             # print q
         q.append(temp)
@@ -92,13 +93,122 @@ def sense(p, colors, measurement, sensor_right):
     return q
 
 # def move(p, U):
-def move(p, motion, p_stay):
+def move(p, motion, p_move):
+    print 'function MOVE called'
     q = []
-    for i in range(len(p)):
-        s = pExact * p[(i-U) % len(p)]
-        s = s + pOvershoot * p[(i-U-1) % len(p)]
-        s = s + pUndershoot * p[(i-U+1) % len(p)]
-        q.append(s)
+    # for i in range(len(p)):
+        # s = pExact * p[(i-U) % len(p)]
+        # s = s + pOvershoot * p[(i-U-1) % len(p)]
+        # s = s + pUndershoot * p[(i-U+1) % len(p)]
+        # q.append(s)
+#  [0,0] - stay
+#  [0,1] - right
+#  [0,-1] - left
+#  [1,0] - down
+#  [-1,0] - up
+    row = []
+    colum = []
+    
+    #print'motion = ', motion
+    if (motion == [0,0]):
+        #print 'Stay put'
+        q = p
+    elif (motion == [0,1]):
+        print 'Moving to the right'
+        for i in range(len(p)):
+            row = p[i]
+            #print 'row = ', row
+            #print 'p_move = ', p_move
+            temp = []
+            for j in range(len(row)):
+                # Current position gets lower probab. 1-p_move
+                # This is the prob. to stay put
+                w = row[j] * (1-p_move)
+                #print 'w initial = ', w
+                #print 'row[(j-2)%len(row)] =', row[(j-1)%len(row)]
+                # w = pExact * p[(i-U)%len(p)]
+                # Add in the prob. of moving from the cell on the left, wrapping up
+                w = w + p_move * row[(j-1)%len(row)]
+                #print 'w final = ', w
+                temp.append(w)
+            q.append(temp)                
+    elif (motion == [0,-1]):
+        print 'Moving to the left'
+        for i in range(len(p)):
+            row = p[i]
+            #print 'row = ', row
+            #print 'p_move = ', p_move
+            temp = []
+            for j in range(len(row)):
+                # Current position gets lower probab. 1-p_move
+                # This is the prob. to stay put
+                w = row[j] * (1-p_move)
+                #print 'w initial = ', w
+                #print 'row[(j-2)%len(row)] =', row[(j-1)%len(row)]
+                # w = pExact * p[(i-U)%len(p)]
+                # Add in the prob. of moving from the cell on the right, wrapping up
+                w = w + p_move * row[(j+1)%len(row)]
+                #print 'w final = ', w
+                temp.append(w)
+            q.append(temp)                
+    elif (motion == [1,0]):
+        print 'DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDddddd'
+        #print 'Moving down'
+        # k = [row[0] for row in p]
+        for i in range(len(p[1])):
+            # get column
+            row = [row[i] for row in p]
+            print 'row = ', row
+            # #print 'row.T = ', zip(*row)
+            #print 'p_move = ', p_move
+            temp = []
+            for j in range(len(row)):
+                # Current position gets lower probab. 1-p_move
+                # This is the prob. to stay put
+                w = row[j] * (1-p_move)
+                #print 'w initial = ', w
+                #print 'row[(j-2)%len(row)] =', row[(j-1)%len(row)]
+                # w = pExact * p[(i-U)%len(p)]
+                # Add in the prob. of moving from the cell on the left, wrapping up
+                w = w + p_move * row[(j-1)%len(row)]
+                #print 'w final = ', w
+                temp.append(w)
+                q.append(temp)
+        print 'q final = ', q
+        # q = zip(*q) 
+        ddd  = map(list, zip(*q))
+        # print 'q final = ', q
+        # print 'ddd = ', ddd
+        q = ddd
+    elif (motion == [-1,0]):
+        print 'UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUuuuu'
+        #print 'Moving up'
+        # k = [row[0] for row in p]
+        for i in range(len(p[1])):
+            # get column
+            row = [row[i] for row in p]
+            print 'row = ', row
+            # print 'row.T = ', zip(*row)
+            #print 'p_move = ', p_move
+            temp = []
+            for j in range(len(row)):
+                # Current position gets lower probab. 1-p_move
+                # This is the prob. to stay put
+                w = row[j] * (1-p_move)
+                #print 'w initial = ', w
+                #print 'row[(j-2)%len(row)] =', row[(j-1)%len(row)]
+                # w = pExact * p[(i-U)%len(p)]
+                # Add in the prob. of moving from the cell on the left, wrapping up
+                w = w + p_move * row[(j+1)%len(row)]
+                #print 'w final = ', w
+                temp.append(w)
+        q.append(temp)
+        ddd  = map(list, zip(*q))
+        # print 'q final = ', q
+        # print 'ddd = ', ddd
+        q = ddd        
+    else:
+        print 'WTF'
     return q
     
 # def move(p, U):
@@ -108,6 +218,14 @@ def localize(colors,measurements,motions,sensor_right,p_move):
     # initializes p to a uniform distribution over a grid of the same dimensions as colors
     pinit = 1.0 / float(len(colors)) / float(len(colors[0]))
     p = [[pinit for row in range(len(colors[0]))] for col in range(len(colors))]
+    
+    # p[0][0] = 1
+    # p[0][1] = 2
+    # p[0][2] = 3
+    # p[1][0] = 5
+    # p[2][0] = 9
+
+    # print 'p.T = ', zip(*p)
     q = []
     print 'pinitialized = !!!' , p
     
@@ -116,9 +234,11 @@ def localize(colors,measurements,motions,sensor_right,p_move):
         # sense1( p );
     for i in range(0, len(motions)):
         # for j in range (0, len())
-
         print i;
-    q = sense(p, colors, 'R', sensor_right)
+        w = move(p, motions[i], p_move);
+        print 'After move, p = ',  w
+        q = sense(w, colors, measurements[i], sensor_right)
+        p = q
     print("TEST")
         
     return q
@@ -145,10 +265,10 @@ def show(p):
 colors = [['G', 'G', 'G'],
           ['G', 'R', 'R'],
           ['G', 'G', 'G']]
-measurements = ['R']
-motions = [[0,0]]
+measurements = ['R', 'R']
+motions = [[0,0], [0,1]]
 sensor_right = 1.0
-p_move = 1.0
+p_move = 0.5
 p = localize(colors,measurements,motions,sensor_right,p_move)
 show(p) # displays your answer
 # sense(p)
